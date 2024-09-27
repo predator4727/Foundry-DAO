@@ -17,7 +17,7 @@ contract GovernorTest is Test {
     address public VOTER = makeAddr("voter");
     uint256 public constant INITIAL_SUPPLY = 100 ether;
     uint256 public constant MIN_DELAY = 3600;
-    uint256 public constant VOTING_DELAY = 1;
+    uint256 public constant VOTING_DELAY = 7200;
     uint256 public constant VOTING_PERIOD = 50400;
     address[] proposers;
     address[] executors;
@@ -29,7 +29,7 @@ contract GovernorTest is Test {
         govToken = new GovToken();
         govToken.mint(VOTER, INITIAL_SUPPLY);
 
-        vm.prank(VOTER);
+        vm.startPrank(VOTER);
         govToken.delegate(VOTER);
         timelock = new TimeLock(MIN_DELAY, proposers, executors);
         governor = new MyGovernor(govToken, timelock);
@@ -41,6 +41,7 @@ contract GovernorTest is Test {
         timelock.grantRole(proposerRole, address(governor));
         timelock.grantRole(executorRole, address(0));
         timelock.revokeRole(adminRole, msg.sender);
+        vm.stopPrank();
 
         box = new Box();
         box.transferOwnership(address(timelock));
